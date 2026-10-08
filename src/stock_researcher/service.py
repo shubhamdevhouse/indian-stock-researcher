@@ -8,7 +8,7 @@ from .data import filings, prices, universe
 from .data.nse_client import nse
 
 
-ANALYSIS_VERSION = "v4"  # bump when scoring/adjustment logic changes to invalidate cached analyses
+ANALYSIS_VERSION = "v5"  # bump when scoring/adjustment logic changes to invalidate cached analyses
 
 
 def resolve(name: str, force: bool = False) -> dict:
@@ -49,8 +49,6 @@ def analyze_symbol(symbol: str, benchmark: str = config.DEFAULT_BENCHMARK, refre
     quarters = filings.load(symbol)
     stamp = f"{quarters[-1]['period_end']}#{quarters[-1]['seq_id']}" if quarters else "none"
     key = f"{ANALYSIS_VERSION}:{symbol}:{benchmark}:{as_of}:{stamp}"
-    print(key)
-    print("\n")
     cached = db.get_snapshot("analysis", key)
     if cached:
         return cached
@@ -112,7 +110,7 @@ def rank_universe(name: str, progress=None, refresh_data: bool = True) -> dict:
     ranked = {
         "universe": u["index"], "kind": u["kind"], "etf": u["etf"],
         "as_of": ok[0]["as_of"] if ok else None,
-        "index_trend": index_trend, "breadth": breadth, "errors": errors,
+        "benchmark": bench_name, "index_trend": index_trend, "breadth": breadth, "errors": errors,
         "rows": [{"rank": i, **signals.compact_row(a)} for i, a in enumerate(ok, 1)],
     }
     if refresh_data:  # unrefreshed data may be older than the key's session, so don't cache it under that key
@@ -129,7 +127,7 @@ def screen(name: str, offset: int = 0, limit: int = config.SCREEN_PAGE_MAX, prog
     limit = max(1, min(limit, config.SCREEN_PAGE_MAX))
     page = rows[offset:offset + limit]
     end = offset + len(page)
-    out = {k: r[k] for k in ("universe", "kind", "etf", "as_of", "data_refresh", "index_trend", "breadth")}
+    out = {k: r[k] for k in ("universe", "kind", "etf", "as_of", "data_refresh", "benchmark", "index_trend", "breadth")}
     out.update({
         "total": len(rows), "offset": offset, "returned": len(page),
         "has_more": end < len(rows), "next_offset": end if end < len(rows) else None,

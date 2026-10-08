@@ -3,7 +3,7 @@ from stock_researcher.data import prices
 
 
 def _ranked(n):
-    return {"universe": "NIFTY TEST", "kind": "index", "etf": None, "as_of": "2026-10-06",
+    return {"universe": "NIFTY TEST", "kind": "index", "etf": None, "as_of": "2026-10-06", "benchmark": "NIFTY TEST",
             "index_trend": None, "breadth": {}, "errors": {}, "data_refresh": {},
             "rows": [{"rank": i, "symbol": f"S{i}"} for i in range(1, n + 1)]}
 
@@ -12,6 +12,7 @@ def test_screen_pages(monkeypatch):
     monkeypatch.setattr(service, "rank_universe", lambda name, progress=None: _ranked(60))
     p1 = service.screen("x", 0, 25)
     assert [r["rank"] for r in p1["rows"]] == list(range(1, 26))
+    assert p1["benchmark"] == "NIFTY TEST"
     assert p1["has_more"] and p1["next_offset"] == 25 and p1["total"] == 60 and "bottom" in p1
     p3 = service.screen("x", 50, 25)
     assert [r["rank"] for r in p3["rows"]] == list(range(51, 61))

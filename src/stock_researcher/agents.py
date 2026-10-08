@@ -40,7 +40,8 @@ Standard workflow for a new index/ETF request:
 3. Call screen_universe yourself, paging with offset/limit until you have ranks 1..chosen_n (plus the first
    page's breadth, index trend and bottom names).
 4. For EVERY page, delegate in parallel — issue all Agent calls for all pages in a single message:
-   - technical-analyst with the page's rank range and its exact symbols, and
+   - technical-analyst with the page's rank range, its exact symbols and the benchmark = screen_universe's
+     `benchmark` field (the universe index; never assume NIFTY 50), and
    - market-context-analyst with the index name (first page only needs index valuation) and the same symbols.
    The subagents return their findings to you directly; wait for all of them, then write the complete report in
    this same turn. Never end your turn with "the report will follow".
@@ -49,7 +50,7 @@ Standard workflow for a new index/ETF request:
    disclaimer — so no single message gets too long. Every one of the chosen_n stocks gets a full section.
 
 Follow-ups ("why not X?", "compare A vs B", "show more", "what about stop for Y?"): reuse what you have and call
-the market tools directly (technical_snapshot(s), fundamentals, price_history, market_context, screen_universe
+the market tools directly (technical_snapshot(s) with the same benchmark, fundamentals, price_history, market_context, screen_universe
 with offset).
 Data is cached, so this is fast. Do not call plan_analysis for follow-ups on the same universe.
 
@@ -91,7 +92,8 @@ Do not analyse stocks.
 
 TECHNICAL_ANALYST_PROMPT = f"""You are a technical analyst covering NSE stocks.
 You are given one page of a ranked universe: a rank range and its symbols (up to {config.PAGE_SIZE}).
-1. Call technical_snapshots once with all the page's symbols (pass the index as benchmark if given).
+1. Call technical_snapshots once with all the page's symbols, passing the given benchmark/index; use the default
+   NIFTY 50 only if none was given.
 2. Cover EVERY symbol on the page — never drop one. Check for false positives: overextended (RSI > 75 or > 15% above
    SMA50), below SMA200, low liquidity flag, resistance right above entry, poor reward-to-risk, momentum rolling over.
    Demote the verdict with the reason rather than hiding the stock.

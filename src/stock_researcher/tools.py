@@ -103,7 +103,7 @@ async def screen_universe(args):
 @tool("technical_snapshots", f"Full technical analysis (all signals with evidence, score breakdown, verdict, levels, "
       f"trade plan) for up to {config.PAGE_SIZE} stocks in one call. Use for a deep-dive page.",
       _schema({"symbols": {"type": "array", "items": {"type": "string"}, "maxItems": config.PAGE_SIZE},
-               "benchmark": {"type": "string", "description": "Index for relative strength (default 'NIFTY 50')"}},
+               "benchmark": {"type": "string", "description": "Index for relative strength: pass the universe index being analysed (screen_universe's `benchmark`); defaults to 'NIFTY 50' only if omitted"}},
               ["symbols"]))
 async def technical_snapshots(args):
     return await _run(service.analyze_many, args["symbols"], args.get("benchmark") or config.DEFAULT_BENCHMARK)
@@ -113,7 +113,7 @@ async def technical_snapshots(args):
       "score breakdown (technical + fundamentals), verdict, support/resistance, a trade plan (entry, stop, targets) "
       "and the quarterly-results fundamentals block with red flags.",
       _schema({"symbol": SYMBOL,
-               "benchmark": {"type": "string", "description": "Index for relative strength (default 'NIFTY 50')"}},
+               "benchmark": {"type": "string", "description": "Index for relative strength: pass the universe index being analysed (screen_universe's `benchmark`); defaults to 'NIFTY 50' only if omitted"}},
               ["symbol"]))
 async def technical_snapshot(args):
     return await _run(service.analyze_symbol, args["symbol"], args.get("benchmark") or config.DEFAULT_BENCHMARK)
