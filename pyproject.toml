@@ -1,0 +1,30 @@
+[project]
+name = "stock-researcher"
+version = "0.1.0"
+description = "Multi-agent NSE (Indian equity) technical research assistant built on the Claude Agent SDK and jugaad-data"
+readme = "README.md"
+authors = [
+    { name = "Shubham", email = "shubham2dawra@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "claude-agent-sdk>=0.2.163",
+    "cryptography<49",
+    "jugaad-data>=0.35.10",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "python-dotenv>=1.2.4",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+stock-researcher = "stock_researcher.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
