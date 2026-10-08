@@ -5,6 +5,10 @@ An interactive, multi-agent research assistant for **Indian equities (NSE)**, bu
 [Claude Agent SDK](https://docs.claude.com/en/docs/agent-sdk/overview) and
 [jugaad-data](https://github.com/jugaad-py/jugaad-data).
 
+> Educational research only — not SEBI-registered investment advice.
+
+> Please Note this project is still WIP, use it at your own risk.
+
 You give it an **index or ETF** (for example `NIFTY 50`, `Nifty Bank`, `NIFTYBEES`, `MID150BEES`). It then:
 
 1. Works out the stock universe. An ETF is mapped to the index it tracks, and the constituents are pulled live from NSE.
@@ -14,7 +18,6 @@ You give it an **index or ETF** (for example `NIFTY 50`, `Nifty Bank`, `NIFTYBEE
 5. Hands off to specialist agents, which dig into the leaders, filter out false positives and add NSE context.
 6. Writes a **ranked report in chat**. Each pick gets a verdict, the technical proof behind it (exact indicator values), a fundamentals line from the latest quarter and an ATR-based trade plan.
 
-> Educational research only — not SEBI-registered investment advice.
 
 ## Setup
 
@@ -114,7 +117,6 @@ CLI chat (rich) ──► Orchestrator agent (ClaudeSDKClient)
         NSE client (jugaad-data, throttled + retry) ◄─► SQLite cache (data/market.db)
 ```
 
-- **Full method:** see [docs/ANALYSIS_METHOD.md](docs/ANALYSIS_METHOD.md). It lists every signal and its points, and what is and isn't used. In short: 85% technical, plus a 15-point earnings-quality bucket and a red-flag gate from the quarterly results filings.
 - **Deterministic numbers, LLM reasoning.** Python computes every indicator, signal and score. The agents only cite tool output and are told never to quote a number from memory.
 - **Scoring (0–100):** 0.85 × technical (trend 30, momentum 25, volume/delivery 15, relative strength vs benchmark 20, breakout/volatility 10) + fundamentals 0–15 (growth 6, profitability trend 4, quality 5). Without a parsable filing a stock gets a neutral 7.5.
   - Any fundamental red flag caps BUY/ACCUMULATE at **WATCH**.
